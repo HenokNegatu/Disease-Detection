@@ -134,7 +134,7 @@
             .catch(error => console.error('Error:', error));
         }
 
-        class_names = ['covid', 'normal', 'pneumonia', 'viral_pneumonia']
+        class_names = ['covid', 'normal', 'pneumonia', 'viral_pneumonia', 'bacterial_pneumonia', 'tuberculosis']
         function displayResults(results) {
             console.log(results)
             document.getElementById('diseaseName').textContent = results.predicted_label;

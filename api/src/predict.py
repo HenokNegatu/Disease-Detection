@@ -32,7 +32,7 @@ class PredictModel:
             file_bytes = file_read_result
         
         file_stream = io.BytesIO(file_bytes)
-        img = image.load_img(file_stream, target_size=(150, 150)) 
+        img = image.load_img(file_stream, target_size=(224, 224)) 
         img_array = image.img_to_array(img)
         img_array = img_array.astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=int(0))
