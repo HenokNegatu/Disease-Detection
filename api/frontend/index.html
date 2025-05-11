@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediScan - Disease Detection</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>MediScan</h1>
+            <h2>Disease Detection from Medical Images</h2>
+        </header>
+
+        <section class="upload-section">
+            <div class="drop-zone" id="dropZone">
+                <p>Drag and drop your image file here, or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                    Browse Files
+                </button>
+            </div>
+
+        </section>
+
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-inner">
+                <div class="img-container">
+                    <img id="previewImage" alt="Image preview" >
+                </div>
+                <div>
+                    <h1 class="disease-header" id="diseaseName"></h1>
+    
+                    <h3 class="section-title">Confidence</h3>
+                    <p class="confidence" id="confidence"></p>
+    
+                    <h3 class="section-title">Class Confidence Scores</h3>
+                    <ul class="scores" id="scores"></ul>
+                </div>
+            </div>
+
+            <button class="upload-again-btn" onclick="showUploadSection()">Upload Again</button>
+            <div class="disclaimer-box">
+                <p><strong>Disclaimer:</strong> This is a demonstration application. The predictions are simulated and
+                    should not be used for actual medical diagnosis. Always consult with a healthcare professional for
+                    medical advice.</p>
+            </div>
+        </section>
+
+        <section class="how-it-works">
+            <div class="step">
+                <h3>1. Upload Image</h3>
+                <p>Upload a medical image from your device or drag and drop it directly.</p>
+            </div>
+            <div class="step">
+                <h3>2. AI Analysis</h3>
+                <p>Our advanced AI system analyzes the image to identify potential diseases.</p>
+            </div>
+            <div class="step">
+                <h3>3. Get Results</h3>
+                <p>View detailed results including diagnosis, symptoms, and treatment options.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 MediScan. All rights reserved.</p>
+            <p><em>Disclaimer: This application is for demonstration purposes only and should not be used for actual
+                    medical diagnosis.</em></p>
+        </footer>
+    </div>
+
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewImage = document.getElementById('previewImage');
+        const resultsSection = document.getElementById('resultsSection');
+        const uploadSection = document.querySelector('.upload-section');
+
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        // File input handler
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    previewImage.style.display = '';
+                    previewImage.src = e.target.result;
+                    uploadSection.style.display = 'none';
+                    simulateAnalysis(file);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function simulateAnalysis(file) {
+            // Simulate AI analysis delay
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(diagnosisResults => displayResults(diagnosisResults))
+            .catch(error => console.error('Error:', error));
+        }
+
+        class_names = ['covid', 'normal', 'pneumonia', 'viral_pneumonia']
+        function displayResults(results) {
+            console.log(results)
+            document.getElementById('diseaseName').textContent = results.predicted_label;
+            document.getElementById('confidence').textContent = results.confidence;
+            const classScoresList = results.class_scores.map((score, index) => `<li>${class_names[index]}: ${score}</li>`).join('');
+            document.getElementById('scores').innerHTML = classScoresList;
+            resultsSection.style.display = '';
+        }
+
+        function showUploadSection() {
+            resultsSection.style.display = 'none';
+            uploadSection.style.display = 'block';
+            previewImage.style.display = 'none';
+            previewImage.src = '';
+        }
+    </script>
+</body>
+
+</html>
